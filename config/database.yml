@@ -1,0 +1,36 @@
+sqlite: &sqlite
+  adapter: sqlite3
+  database: db/db.sqlite3
+
+pg: &pg
+  adapter: postgresql
+  encoding: unicode
+  username: postgres
+  password:
+  hostname: localhost
+  
+my: &my
+  adapter: mysql2
+  encoding: utf8
+  username: root
+  password:
+
+default: &default
+  # change to pg, sqlite, or my:
+  <<: *pg
+  pool: 5
+
+
+development: 
+  database: dagdemo_dev
+  <<: *default
+
+test: 
+  database: dagdemo_test
+  <<: *default
+
+production:
+  database: dagdemo_prod
+  <<: *default
+
+

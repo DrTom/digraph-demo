@@ -1,0 +1,74 @@
+DAG (Directed Acyclic Graph) - Demo
+===================================
+
+This project demonstrates the implementation of a directed and acyclic graph
+structure. It is essentially an improvement over the encoding, queries and some
+technical issues as present in the
+[act-as-dag](https://github.com/DrTom/acts-as-dag) gem.
+
+Read the article [Encoding and Querying Graphs in the Relational
+Model][my-post] for more information.
+
+Scalability
+-----------
+
+The inner workings of this implementation are such that it won't fall on your
+feet for large and even huge graphs. It essentially (unlike the act-as-dag gem)
+scales very well. I would recommend to replace some queries with CTEs, and use
+db-triggers for maximum performance on really huge networks. Read the
+[article][my-post] for a start.
+
+
+Extending to General Graphs
+---------------------------
+
+The acyclic structure, and other graph properties are enforced by hooks in the
+`app/model/arc.rb`.  The implementation is flexible and any of the constraints
+can be disabled at will:
+
+    before_save :prevent_back_loop
+    before_save :prevent_cycle
+    before_save :prevent_multi_arc
+    before_save :prevent_self_loop
+
+
+Usage By Example
+----------------
+
+    Node.create
+
+    Node.first.successors << Node.create
+
+    Node.first.successors
+
+    Node.first.graph_descendants
+
+    Node.last.graph_ancestors
+
+
+
+Generator Tasks 
+---------------
+
+There are a few generators to create graphs to explore or play with. 
+
+1. `rake generator:twostar N=10`, creates two connected stars in a particular
+   manner, see the corresponding figure in the [article][my-post].
+
+2. `rake generator:cycle N=3`, tries to create a cycle, results in a chain if
+   `before_save :prevent_cycle` is not disabled
+
+3. `rake generator:er N=100 M=500`, creates an Erdős–Rényi like random network 
+
+`N` is the target number of nodes, and likewise `M` the target number of arcs
+(if applicable). Defaults are in place.
+
+
+Notation
+--------
+
+The customary _descendants_ and _ancestors_ terms as used in graph theory clash
+with existing ruby methods. They are replaced by _graph_descendants_ and
+_graph_ancestors_ respectively.
+
+[my-post]: http://drtom.schank.ch/posts/2012/02/11/Encoding_and_Querying_Graphs_in_the_Relational_Model/
